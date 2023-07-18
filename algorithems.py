@@ -5,7 +5,8 @@ import numpy as np
 PIXELS_TO_MICROMETER = 1.74
 
 def recognizeCircle(img):
-    _ ,thresh = cv2.threshold(img,127,255,0)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _ ,thresh = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
     canny = cv2.Canny(thresh, 200 ,1529)
     contours, _ = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cv2.waitKey(1)
