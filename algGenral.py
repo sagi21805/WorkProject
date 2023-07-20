@@ -1,10 +1,13 @@
 import cv2
 import numpy as np
+from abc import ABC
 
-class Img:
+
+class Img(ABC):
 
     def __init__(self, liveImg) -> None:
-        self.img = cv2.resize(liveImg, (1269, 714))
+        # self.img = cv2.resize(liveImg, (1269, 714))
+        self.img = liveImg
         self.shape: tuple[int, int, int] = self.img.shape
         self.shapesContours = []
         self.shapesConstants = {}
@@ -23,6 +26,29 @@ class Img:
         self.shapesContour = []
         self.shapesConstants = {}
 
+    def ApplyFillter(self, kernelSize: tuple[int, int], fillter: list[list], stride: int  = 1):
+        self.imgAfterFillter = []
+        fillterMatrix = np.array(fillter)
+        pixelTimes = 0
+        rowTimes = 0
+        data = np.array(self.img)
+        data = data.reshape(self.img.shape[0], self.img.shape[1])  
+        for n in range(int(np.ceil((self.img.shape[1] - kernelSize[1]) / stride))):     
+            for i in range(int(np.ceil((self.img.shape[0] - kernelSize[0]) / stride))):
+                kernel = []    
+                for row in range(stride * rowTimes, (kernelSize[1] + (stride * rowTimes))):
+                    pixelList = []
+                    for pixel in range(stride * pixelTimes, (kernelSize[0] + (stride * pixelTimes))):
+                        pixel = data[row][pixel]
+                        pixelList.append(pixel)
+                    kernel.append(pixelList)
+                kernel = np.array(kernel)
+                newPixel = kernel * fillterMatrix
+                self.imgAfterFillter.append(newPixel.sum())
+                pixelTimes += 1
+            rowTimes += 1
+            pixelTimes = 0
+        self.imgAfterFillter = np.array(self.imgAfterFillter)
 
 
 

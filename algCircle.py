@@ -1,15 +1,17 @@
 import cv2
-import algGenral
+from algGenral import Img 
 import numpy as np
 
  # dict of types {float : tuple} 
-class CircleImg(algGenral.Img):
+class CircleImg(Img):
 
     def __init__(self, liveImg) -> None:
         super().__init__(liveImg)
         self.circleDict = {}
         self.aprrovedCircles = {}
 
+
+    # worth trying with real camera and data
     def recognizeCircle(self):
         self.imgPrep()
         self.circleContour, _ = cv2.findContours(self.perpedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -17,8 +19,14 @@ class CircleImg(algGenral.Img):
         if len(self.circleContour) != 0:
             for contour in self.circleContour:
                 if cv2.contourArea(contour) > 55:
-                    (x, y), r = cv2.minEnclosingCircle(contour)
+                    # (x, y), r = cv2.minEnclosingCircle(contour)
+                    #find the center and the radius
+                    M = cv2.moments(contour)
+                    x = int(M["m10"] / M["m00"])
+                    y = int(M["m01"] / M["m00"])
+                    r = (np.sqrt(cv2.contourArea(contour) / np.pi) + cv2.arcLength(contour, True) / 2 /np.pi) / 2
                     self.circleDict.update({r : (round(x), round(y))})
+                  
             self.shapesConstants.update({"circleDict" : self.circleDict})
             self.shapesContours.append(self.circleContour)
 
@@ -29,13 +37,10 @@ class CircleImg(algGenral.Img):
             if cntArea > 55:
                 cntAproxRad = np.sqrt(cntArea/np.pi)
                 i = (np.abs(arr - cntAproxRad)).argmin()
-                self.aprrovedCircles.update({arr[i] : self.circleDict[arr[i]]})
-
-        # improve with contour center 
-        # 
-        # M = cv2.moments(c)
-        # cX = int(M["m10"] / M["m00"])
-        # cY = int(M["m01"] / M["m00"])
+                self.aprrovedCircles.update({arr[i] : self.circleDict[arr[i]]})        
+                # M = cv2.moments(c)
+                # cX = int(M["m10"] / M["m00"])
+                # cY = int(M["m01"] / M["m00"])
                                     
                 
 
@@ -43,8 +48,8 @@ class CircleImg(algGenral.Img):
         for rad in self.aprrovedCircles:
             self.markedImg = cv2.circle(self.img, (self.aprrovedCircles[rad][0],self.aprrovedCircles[rad][1]), round(rad), (255, 0, 0), 2)
     
-    def markUnstay(self):
-        for rad in self.aprrovedCircles:
+    def markUnstaybled(self):
+        for rad in self.circleDict:
             self.markedImg = cv2.circle(self.img, (self.circleDict[rad][0],self.circleDict[rad][1]), round(rad), (255, 0, 255), 2)
 
     
