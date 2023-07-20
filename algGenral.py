@@ -1,16 +1,33 @@
 import cv2
 import numpy as np
 
-def imgPrep(img):
-    img = cv2.resize(img, (1269, 714))
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blur = cv2.blur(gray, (4,4))
-    v = np.median(blur)
-    sigma = 0.2
-    lower_thresh = int(max(0, (1.0 - sigma) * v))
-    upper_thresh = int(min(255, (1.0 + sigma) * v))
-    canny = cv2.Canny(blur , lower_thresh ,upper_thresh)
-    return canny
+class Img:
+
+    def __init__(self, liveImg) -> None:
+        self.img = cv2.resize(liveImg, (1269, 714))
+        self.shape: tuple[int, int, int] = self.img.shape
+        self.shapesContours = []
+        self.shapesConstants = {}
+        self.pixelsToMicroMeter = 1.74
+        self.lenSize = 10
+
+    def imgPrep(self):
+        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        bliateral = cv2.bilateralFilter(gray, 10, 45, 45)
+        lower_thresh = 255/5
+        upper_thresh = 255
+        canny = cv2.Canny(bliateral , lower_thresh ,upper_thresh)
+        self.perpedImg = cv2.dilate(canny, np.ones((1, 1), np.uint8))
+
+    def clear(self):
+        self.shapesContour = []
+        self.shapesConstants = {}
 
 
- 
+
+
+    
+
+    
+        
+    

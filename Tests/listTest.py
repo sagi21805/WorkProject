@@ -1,15 +1,19 @@
-similar  = [1, 1.3]
+import numpy as np
 
-circleDict = {
+def closest_value(input_list, input_value):
 
-    1: 2,
-    1.1 : 2,
-    1.3 : 3
+  arr = np.asarray(input_list)
 
+  i = (np.abs(arr - input_value)).argmin()
 
-}
+  return arr[i]
 
-list = [circleDict.pop(key) for key in similar]
-print(list)
-print(circleDict)
+if __name__ == "__main__" :
 
+  list1 = [22, 12, 51, 23, 48, 16, 34, 61]
+
+  num=int(input("Enter the value: "))
+
+  val=closest_value(list1,num)
+
+  print("The closest value to the "+ str(num)+" is",val)

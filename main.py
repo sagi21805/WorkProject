@@ -1,18 +1,27 @@
-import algCircle
 import cv2 
-import algGenral
-
+from algCircle import CircleImg
+from algGenral import Img
 video = cv2.VideoCapture(0)
 
-success, img = video.read()
-if success:
-    canny = algGenral.imgPrep(img)
-    img, circlesRad = algCircle.recognizeCircle(canny, cv2.resize(img, (1269, 714)))
-    before = algCircle.markCircles(img)
-    algCircle.stabilizerCircle(circlesRad)
-    after = algCircle.markCircles(img)
+# recognize circles
 
-    cv2.imshow("b", before)
-    cv2.waitKey(0)
+while True:
+    success, liveImg = video.read()
+    if success:
+        circleImg = CircleImg(liveImg)
+
+        circleImg.recognizeCircle()
+        circleImg.stayblize()
+        circleImg.mark()
+        try:
+            cv2.imshow("marked img", circleImg.markedImg)
+        except:
+            pass
+        circleImg.markUnstay()
+        try:
+            cv2.imshow("unmarked img", circleImg.markedImg)
+        except:
+            pass
+        cv2.waitKey(1)
 
 
