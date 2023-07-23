@@ -6,7 +6,7 @@ from abc import ABC
 class Img(ABC):
 
     def __init__(self, liveImg) -> None:
-        # self.img = cv2.resize(liveImg, (1269, 714))
+        self.img = cv2.resize(liveImg, (int(liveImg.shape[1]*40/100), int(liveImg.shape[0]*40/100)))
         self.img = liveImg
         self.shape: tuple[int, int, int] = self.img.shape
         self.shapesContours = []
@@ -20,7 +20,7 @@ class Img(ABC):
         lower_thresh = 255/5
         upper_thresh = 255
         canny = cv2.Canny(bliateral , lower_thresh ,upper_thresh)
-        self.perpedImg = cv2.dilate(canny, np.ones((1, 1), np.uint8))
+        self.perpedImg = cv2.dilate(canny, np.ones((1, 1), np.uint8), iterations=2)
 
     def clear(self):
         self.shapesContour = []
