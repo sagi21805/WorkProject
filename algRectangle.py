@@ -1,3 +1,4 @@
+import math
 import cv2
 import numpy as np
 from algGenral import Img
@@ -6,16 +7,16 @@ class RectImg(Img):
     
     def __init__(self, liveImg) -> None:
         super().__init__(liveImg)
-        self.aprrovedRect = {}
+        self.aprrovedRect = []
         self.rectList = []
 
     def recognizeRectangle(self):
         self.imgPrep()
         cv2.imshow("img", self.perpedImg)
-        self.rectContours, _ = cv2.findContours(self.perpedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        self.rectContours, _ = cv2.findContours(self.perpedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         if len(self.rectContours) != 0:
             for contour in self.rectContours:
-                if cv2.contourArea(contour) > 310.5:
+                if cv2.contourArea(contour) > 310:
                     rect = cv2.minAreaRect(contour)
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
@@ -30,11 +31,20 @@ class RectImg(Img):
                     self.shapesContours.append(self.rectContours)
 
     def stayblize(self):
-        pass
-
+        # bad way improve
+        self.aprrovedRect = self.rectList
+        for i, rect in enumerate(self.rectList):
+            # if np.sqrt((rect[0][0] - rect[3][0])**2 + (rect[0][1] - rect[3][1])**2) < 450:
+            #     self.aprrovedRect.pop(i)
+            #     continue
+            for rect2 in self.rectList:                    
+                    dist = np.sqrt((rect[0][0] - rect2[0][0])**2 + (rect[0][1] - rect2[0][1])**2)
+                    if dist < 100 and dist != 0:
+                        if cv2.contourArea(rect) > cv2.contourArea(rect2):
+                            self.aprrovedRect.pop(i)
+                            
     def mark(self):
         for rect in self.rectList:
             self.markedImg = cv2.drawContours(self.img ,[rect],0,(0,255,255),2)
             self.markedImg = cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-
 

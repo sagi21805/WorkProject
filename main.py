@@ -13,10 +13,12 @@ while True:
     circleImg.recognizeRectangle()
     circleImg.stayblize()
     circleImg.mark()
+
     try:
         cv2.imshow("marked img", circleImg.markedImg)
     except:
         pass
     cv2.waitKey(0)
+        
 
 
