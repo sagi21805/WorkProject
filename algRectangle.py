@@ -12,11 +12,11 @@ class RectImg(Img):
 
     def recognizeRectangle(self):
         self.imgPrep()
-        cv2.imshow("img", self.perpedImg)
-        self.rectContours, _ = cv2.findContours(self.perpedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        cv2.imshow("img", self.prepedImg)
+        self.rectContours, _ = cv2.findContours(self.prepedImg, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
         if len(self.rectContours) != 0:
             for contour in self.rectContours:
-                if cv2.contourArea(contour) > 310:
+                if cv2.contourArea(contour) > 100:
                     rect = cv2.minAreaRect(contour)
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
@@ -44,7 +44,8 @@ class RectImg(Img):
                             self.aprrovedRect.pop(i)
                             
     def mark(self):
+        self.markedImg = self.img
         for rect in self.rectList:
-            self.markedImg = cv2.drawContours(self.img ,[rect],0,(0,255,255),2)
-            self.markedImg = cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-
+            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+            cv2.imshow("nar", self.markedImg)

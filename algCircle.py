@@ -41,6 +41,8 @@ class CircleImg(Img):
                 # M = cv2.moments(c)
                 # cX = int(M["m10"] / M["m00"])
                 # cY = int(M["m01"] / M["m00"])
+
+                # by human clicking!
                                     
                 
 
