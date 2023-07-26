@@ -8,7 +8,7 @@ video = cv2.VideoCapture(0)
 
 while True:
     success, liveImg = video.read()
-    # liveImg = cv2.imread(r".\Images\test\images\\15.jpg")
+    # liveImg = cv2.imread("0003.jpg")
 
     if success:
 
@@ -20,7 +20,7 @@ while True:
         circleImg.thresholdByKernel((3, 3))
         circleImg.recognizeRectangle()
         circleImg.mark()
-        cv2.waitKey(1500)
+        cv2.waitKey(1000)
             
 
 

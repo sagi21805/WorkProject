@@ -15,7 +15,7 @@ class Img(ABC):
 
     def thresholdByKernel(self, kernelSize: tuple[int, int]):
         x = skimage.measure.block_reduce(self.gray, kernelSize, np.sum, 1)
-        threshold = (np.average(x) * 0.666 + 127.5)
+        threshold = (np.average(x) * 0.666 + 85)
         self.prepedImg = np.zeros(x.shape, np.uint8)
         for r, row in enumerate(x):
             for p ,pixel in enumerate(row):
