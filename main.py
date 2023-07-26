@@ -6,19 +6,21 @@ video = cv2.VideoCapture(0)
 
 # recognize circles
 
-# while True:
-# success, liveImg = video.read()
-liveImg = cv2.imread(r"C:\VsCode\python\WorkProject\Images\test\images\\6.jpg")
+while True:
+    success, liveImg = video.read()
+    # liveImg = cv2.imread(r".\Images\test\images\\15.jpg")
 
-# if success:
+    if success:
 
-circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
-circleImg.recognizeRectangle()
-circleImg.mark()
-print(2)
-# filter = np.array([[1,1,1],[0,0,0],[-1,-1,-1]])
-# fillter = cv2.filter2D(circleImg.img, -1, filter)
-cv2.waitKey(0)
-        
+
+
+        # circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
+        circleImg = RectImg(liveImg)
+
+        circleImg.thresholdByKernel((3, 3))
+        circleImg.recognizeRectangle()
+        circleImg.mark()
+        cv2.waitKey(1500)
+            
 
 

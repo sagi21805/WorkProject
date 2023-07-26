@@ -11,41 +11,34 @@ class RectImg(Img):
         self.rectList = []
 
     def recognizeRectangle(self):
-        self.imgPrep()
         cv2.imshow("img", self.prepedImg)
-        self.rectContours, _ = cv2.findContours(self.prepedImg, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-        if len(self.rectContours) != 0:
-            for contour in self.rectContours:
-                if cv2.contourArea(contour) > 100:
-                    rect = cv2.minAreaRect(contour)
-                    box = cv2.boxPoints(rect)
-                    box = np.int0(box)
-                    self.rectList.append(box)
-                    # print("contour ->")
-                    # print(contour)
-                    # print("rect ->")
-                    # print(rect)
-                    # print("box - >")
-                    # print(box)
-                    self.shapesConstants.update({"rectList" : self.rectList})
-                    self.shapesContours.append(self.rectContours)
+        rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        hierarchy = hierarchy[0]
+        if len(rectContours) != 0:
+            #[next, previous, first child, parent] --> hierarchy 
+            for index, contour in enumerate(rectContours):
+                if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
+                    # if hierarchy[hierarchy[index][2]][2] == -1:
+                        # if cv2.contourArea(contour) > 100:
+                        rect = cv2.minAreaRect(contour)
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+                        self.rectList.append(box)
+                        # print("contour ->")
+                        # print(contour)
+                        # print("rect ->")
+                        # print(rect)
+                        # print("box - >")
+                        # print(box)
+                        self.shapesConstants.update({"rectList" : self.rectList})
+                        self.shapesContours.append(rectContours)
 
-    def stayblize(self):
-        # bad way improve
-        self.aprrovedRect = self.rectList
+    
+    def  mark(self):
+        self.markedImg = cv2.resize(self.img, (self.prepedImg.shape[1],self.prepedImg.shape[0] ))
+        pixelToMicro = self.img.shape[1] / self.markedImg.shape[1] * self.pixelToMicro 
         for i, rect in enumerate(self.rectList):
-            # if np.sqrt((rect[0][0] - rect[3][0])**2 + (rect[0][1] - rect[3][1])**2) < 450:
-            #     self.aprrovedRect.pop(i)
-            #     continue
-            for rect2 in self.rectList:                    
-                    dist = np.sqrt((rect[0][0] - rect2[0][0])**2 + (rect[0][1] - rect2[0][1])**2)
-                    if dist < 100 and dist != 0:
-                        if cv2.contourArea(rect) > cv2.contourArea(rect2):
-                            self.aprrovedRect.pop(i)
-                            
-    def mark(self):
-        self.markedImg = self.img
-        for rect in self.rectList:
-            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            cv2.imshow("nar", self.markedImg)
+            if np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1])  , 2) < 150 and np.round(np.sqrt((rect[1][0] - rect[2][0])**2 + (rect[1][1] - rect[2][1])**2) * self.pixelToMicro , 2) > 300:
+                cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
+                cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) * self.pixelToMicro , 2)), rect[i % 2 + 1], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+                cv2.imshow("nar", self.markedImg)

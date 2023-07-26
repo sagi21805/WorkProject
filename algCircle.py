@@ -14,8 +14,8 @@ class CircleImg(Img):
     # worth trying with real camera and data
     def recognizeCircle(self):
         self.imgPrep()
-        self.circleContour, _ = cv2.findContours(self.perpedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.imshow("ca", self.perpedImg)
+        self.circleContour, _ = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.imshow("ca", self.prepedImg)
         if len(self.circleContour) != 0:
             for contour in self.circleContour:
                 if cv2.contourArea(contour) > 55:
@@ -50,11 +50,11 @@ class CircleImg(Img):
         for rad in self.aprrovedCircles:
             self.markedImg = cv2.circle(self.img, (self.aprrovedCircles[rad][0],self.aprrovedCircles[rad][1]), round(rad), (255, 0, 0), 2)
     
-    def markUnstaybled(self):
+    def markUnstaybled(self):   
         for rad in self.circleDict:
             self.markedImg = cv2.circle(self.img, (self.circleDict[rad][0],self.circleDict[rad][1]), round(rad), (255, 0, 255), 2)
 
-    
+   
     
 
 
