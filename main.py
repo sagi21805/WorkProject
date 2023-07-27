@@ -7,20 +7,20 @@ video = cv2.VideoCapture(0)
 # recognize circles
 
 while True:
-    success, liveImg = video.read()
-    # liveImg = cv2.imread("0003.jpg")
+    # success, liveImg = video.read()
+    liveImg = cv2.imread("0006.jpg")
 
-    if success:
+    # if success:
 
 
+    print("started")
+    # circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
+    circleImg = RectImg(liveImg)
 
-        # circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
-        circleImg = RectImg(liveImg)
-
-        circleImg.thresholdByKernel((3, 3))
-        circleImg.recognizeRectangle()
-        circleImg.mark()
-        cv2.waitKey(1000)
+    circleImg.thresholdByKernel((3, 3))
+    circleImg.recognizeRectangle()
+    circleImg.mark()
+    cv2.waitKey(0)
             
 
 
