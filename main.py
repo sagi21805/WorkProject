@@ -6,9 +6,10 @@ video = cv2.VideoCapture(0)
 
 # recognize circles
 
+
 while True:
     # success, liveImg = video.read()
-    liveImg = cv2.imread("0006.jpg")
+    liveImg = cv2.imread("0005.jpg")
 
     # if success:
 

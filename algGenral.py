@@ -14,14 +14,19 @@ class Img(ABC):
         self.pixelToMicro = 0.174 * self.lenSize
 
     def thresholdByKernel(self, kernelSize: tuple[int, int]):
-        x = skimage.measure.block_reduce(self.gray, kernelSize, np.sum, 1)
-        threshold = (np.average(x) * 0.666 + 85)
+        
+        # notice - I am changing the skimage.measure.block_reduce****
+        bil = cv2.bilateralFilter(self.gray, 15, 100, 100)
+        x = skimage.measure.block_reduce(bil, kernelSize, np.sum, 1)
+        threshold = (np.average(x) * 0.666 + 127.5)
         self.prepedImg = np.zeros(x.shape, np.uint8)
         for r, row in enumerate(x):
             for p ,pixel in enumerate(row):
                 if pixel > threshold:
                     self.prepedImg[r][p] = 255
+        
 
+        
     def clear(self):
         self.shapesContour = []
         self.shapesConstants = {}
