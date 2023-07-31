@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from abc import ABC
-from skimage.measure import block_reduce
+import numpy.lib.stride_tricks
 class Img(ABC):
 
     def __init__(self, liveImg) -> None:
@@ -11,31 +11,29 @@ class Img(ABC):
         self.shapesConstants = {}
         self.lenSize = 10
         self.pixelToMicro = 0.174 * self.lenSize
-
-    @staticmethod
-    def thresholdByKernel(img, kernelSize: tuple[int, int]):
-
-        cv2.imshow("shrap", cv2.resize(img, (1280, 720)))
-        x = block_reduce(img, kernelSize, np.sum, 1)
-        threshold = (np.average(x) * 0.666 + 127.5)
-        output = np.zeros(x.shape, np.uint8)
-        for r, row in enumerate(x):
-            for p ,pixel in enumerate(row):
-                if pixel > threshold:
-                    output[r][p] = 255
-        
-        return output
   
+    def imgPrep(self, s, func):
         
-    def imgPrep(self):
-        
+        resized = cv2.resize(self.gray, np.flip(np.array(self.gray.shape)//3))  
         filter = np.array([[-1, -1,  -1], 
                            [-1,  10, -1], 
                            [-1, -1,  -1]])
         
-        sharpend = cv2.filter2D(self.gray, -1, filter)
-        self.prepedImg = Img.thresholdByKernel(sharpend, (3, 3))
-        self.markedImg = cv2.resize(self.img, (self.prepedImg.shape[1],self.prepedImg.shape[0] ))
+        sharpend = cv2.filter2D(resized, -1, filter)
+        self.prepedImg = Img.applyWindow(sharpend, s, func)
+        self.markedImg = cv2.resize(self.img, (self.prepedImg.shape[1],self.prepedImg.shape[0]))
+    
+    @staticmethod
+    def applyWindow(arr1, s, func):
+        blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
+        x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
+        thresh = np.average(x)*0.7
+        print(x)
+        print(thresh)
+        x[x < thresh] = 0
+        x[x > thresh] = 255
+        print("finished")
+        return np.array(x, dtype=np.uint8)
 
         
 

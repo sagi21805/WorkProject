@@ -1,13 +1,11 @@
 import cv2 
-# from algCircle import CircleImg
 from algRectangle import RectImg
 import numpy as np
-import psutil
-video = cv2.VideoCapture(0)
+# video = cv2.VideoCapture(0)
 
 # recognize circles
 
-liveImg = cv2.imread("0003.jpg")
+liveImg = cv2.imread("0004.jpg")
 
 # if success:
 
@@ -15,9 +13,7 @@ liveImg = cv2.imread("0003.jpg")
 print("started")
 # circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
 circleImg = RectImg(liveImg)
-
-circleImg.imgPrep()
-circleImg.recognizeRectangle()
+circleImg.mainRect(6, np.sum)
 cv2.namedWindow("marked")  
 cv2.setMouseCallback("marked",circleImg.markByClicking)  
 
@@ -25,7 +21,10 @@ cv2.setMouseCallback("marked",circleImg.markByClicking)
 while True:
     # success, liveImg = video.read()
     cv2.imshow("marked", circleImg.markedImg)
+    cv2.imshow("p", circleImg.prepedImg)
     cv2.waitKey(1)
+# cv2.imshow("r", circleImg.markedImg)
+# cv2.waitKey(0)
             
 
 

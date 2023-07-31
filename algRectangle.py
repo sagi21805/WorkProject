@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from algGenral import Img
+import multiprocessing.pool
 
 class RectImg(Img):
     
@@ -9,8 +10,17 @@ class RectImg(Img):
         self.aprrovedRect = []
         self.rectList = []
 
-    def recognizeRectangle(self):
-        cv2.imshow("img", cv2.resize(self.prepedImg, (1280, 720)))
+    def mainRect(self, s, func):
+        with multiprocessing.pool.Pool(8) as p:
+            r = p.starmap(self.recognizeRectangle, [(s, func), ])
+        self.prepedImg = r[0][0]
+        self.markedImg = r[0][1]
+        self.rectList = r[0][2]
+        self.rectContours = r[0][3]
+
+
+    def recognizeRectangle(self, s, func):
+        self.imgPrep(s, func)
         self.rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         hierarchy = hierarchy[0]
         if len(self.rectContours) != 0:
@@ -25,6 +35,7 @@ class RectImg(Img):
                             self.rectList.append(box)
                             self.shapesConstants.update({"rectList" : self.rectList})
                             self.shapesContours.append(self.rectContours)
+        return [self.prepedImg, self.markedImg, self.rectList, self.rectContours]
 
     
     def mark(self):
@@ -39,6 +50,8 @@ class RectImg(Img):
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
             cv2.imshow("nar", self.markedImg)
             
+    # TODO improve with numpy!
+    
     def findClosestPoint(self, x, y):
         closetPointDist = np.inf
         closetBox = []
