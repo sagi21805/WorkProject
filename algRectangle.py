@@ -26,8 +26,8 @@ class RectImg(Img):
         if len(self.rectContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
             for index, contour in enumerate(self.rectContours):
-                # if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
-                #     if hierarchy[hierarchy[index][2]][2] == -1:
+                if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
+                    if hierarchy[hierarchy[index][2]][2] == -1:
                         if cv2.contourArea(contour) > 80:
                             rect = cv2.minAreaRect(contour)
                             box = cv2.boxPoints(rect)
@@ -46,7 +46,7 @@ class RectImg(Img):
             cv2.imshow("markedImage", self.markedImg)
                 
     def markAll(self):
-        for i, rect in enumerate(self.rectContours):
+        for rect in self.rectContours:
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
             cv2.imshow("nar", self.markedImg)
             
@@ -67,7 +67,7 @@ class RectImg(Img):
             rect = self.findClosestPoint(x, y)
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
             cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) * self.pixelToMicro , 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
-
+            print(rect)
         
         
                 

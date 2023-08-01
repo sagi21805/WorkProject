@@ -20,6 +20,7 @@ class Img(ABC):
                            [-1, -1,  -1]])
         
         sharpend = cv2.filter2D(resized, -1, filter)
+        sharpend = cv2.bilateralFilter(sharpend, 15, 75, 75)
         self.prepedImg = Img.applyWindow(sharpend, s, func)
         self.markedImg = cv2.resize(self.img, (self.prepedImg.shape[1],self.prepedImg.shape[0]))
     
@@ -28,8 +29,6 @@ class Img(ABC):
         blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
         x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
         thresh = np.average(x)*0.7
-        print(x)
-        print(thresh)
         x[x < thresh] = 0
         x[x > thresh] = 255
         print("finished")
