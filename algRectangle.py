@@ -17,15 +17,17 @@ class RectImg(Img):
         self.markedImg = r[0][1]
         self.rectList = r[0][2]
         self.rectContours = r[0][3]
+        cv2.imshow("p", self.prepedImg)
+        print("done")
 
 
     def recognizeRectangle(self, s, func):
         self.imgPrep(s, func)
-        self.rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         hierarchy = hierarchy[0]
-        if len(self.rectContours) != 0:
+        if len(rectContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
-            for index, contour in enumerate(self.rectContours):
+            for index, contour in enumerate(rectContours):
                 # if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
                 #     if hierarchy[hierarchy[index][2]][2] == -1:
                         if cv2.contourArea(contour) > 80:
@@ -33,9 +35,22 @@ class RectImg(Img):
                             box = cv2.boxPoints(rect)
                             box = np.int0(box)
                             self.rectList.append(box)
-                            self.shapesConstants.update({"rectList" : self.rectList})
-                            self.shapesContours.append(self.rectContours)
-        return [self.prepedImg, self.markedImg, self.rectList, self.rectContours]
+                            print(box)
+                            contour = np.resize(contour, (131, 2))
+                            maxIdx = np.argmax(box, axis=0)
+                            minIdx = np.argmin(box, axis=0)
+                            maxX, maxY = contour[maxIdx]
+                            minX, minY = contour[minIdx]
+                            width = np.linalg.norm(maxY-maxX)
+                            cv2.line(self.markedImg, maxX, maxY,  (255, 0, 255), 2)                                                                                       
+                            cv2.line(self.markedImg, minX, minY,  (255, 0, 0), 2)                                                      
+                            cv2.line(self.markedImg, minX, maxY,  (255, 0, 255), 2)                                                      
+                            cv2.line(self.markedImg, maxX,minY,  (255, 0, 0), 2)                                                      
+
+                
+
+
+        return [self.prepedImg, self.markedImg, self.rectList, rectContours]
 
     
     def mark(self):
@@ -47,7 +62,7 @@ class RectImg(Img):
                 
     def markAll(self):
         for i, rect in enumerate(self.rectContours):
-            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
+            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
             cv2.imshow("nar", self.markedImg)
             
     # TODO improve with numpy!
