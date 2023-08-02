@@ -12,39 +12,21 @@ class CircleImg(Img):
 
 
     # worth trying with real camera and data
-    def recognizeCircle(self):
-        self.imgPrep()
-        self.circleContour, _ = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.imshow("ca", self.prepedImg)
-        if len(self.circleContour) != 0:
-            for contour in self.circleContour:
-                if cv2.contourArea(contour) > 55:
-                    # (x, y), r = cv2.minEnclosingCircle(contour)
-                    #find the center and the radius
-                    M = cv2.moments(contour)
-                    x = int(M["m10"] / M["m00"])
-                    y = int(M["m01"] / M["m00"])
-                    r = (np.sqrt(cv2.contourArea(contour) / np.pi) + cv2.arcLength(contour, True) / 2 /np.pi) / 2
-                    self.circleDict.update({r : (round(x), round(y))})
-                  
-            self.shapesConstants.update({"circleDict" : self.circleDict})
-            self.shapesContours.append(self.circleContour)
+    def recognizeCircle(self, s, func):
+        self.imgPrep(s, func)
+        rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        hierarchy = hierarchy[0]
+        if len(rectContours) != 0:
+            #[next, previous, first child, parent] --> hierarchy 
+            for index, contour in enumerate(rectContours):
+                # if hierarchy[index][2] == -1:
+                        if cv2.contourArea(contour) > 80:
+                            rect = cv2.minAreaRect(contour)
+                            box = cv2.boxPoints(rect)
+                            box = np.int0(box)
+                            self.rectList.append(box)
 
-    def stayblize(self):
-        arr = np.asarray([rad for rad in self.circleDict])
-        for contour in self.circleContour:
-            cntArea = cv2.contourArea(contour)
-            if cntArea > 55:
-                cntAproxRad = np.sqrt(cntArea/np.pi)
-                i = (np.abs(arr - cntAproxRad)).argmin()
-                self.aprrovedCircles.update({arr[i] : self.circleDict[arr[i]]})        
-                # M = cv2.moments(c)
-                # cX = int(M["m10"] / M["m00"])
-                # cY = int(M["m01"] / M["m00"])
-
-                # by human clicking!
-                                    
-                
+                                                
 
     def mark(self):
         for rad in self.aprrovedCircles:
