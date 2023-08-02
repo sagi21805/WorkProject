@@ -82,7 +82,7 @@ class RectImg(Img):
             rect = self.findClosestPoint(x, y)
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
             cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) * self.pixelToMicro , 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
-
+            print(rect)
         
         
                 
