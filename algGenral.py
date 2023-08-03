@@ -4,15 +4,16 @@ from abc import ABC
 import numpy.lib.stride_tricks
 class Img(ABC):
 
-    def __init__(self, liveImg) -> None:
+    def __init__(self, liveImg: np.ndarray) -> None:
         self.img = liveImg
         self.gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        self.lenSize = 5
-        self.pixelToMicro = -0.348 * self.lenSize + 5.22
+        self.lenSize = 10
+        self.pixelToMicro = 0.174 * self.lenSize
+        print(self.pixelToMicro)
   
     def imgPrep(self, s, func):
         #TODO try avarage and than canny on window
-        resized = cv2.resize(self.gray, np.flip(np.array(self.gray.shape)//3))  
+        resized = cv2.resize(self.gray,  (1645, 925))  
         # filter = np.array([[-1, -1,  -1], 
         #                    [-1,  10, -1], 
         #                    [-1, -1,  -1]])
@@ -26,11 +27,9 @@ class Img(ABC):
     def applyWindow(arr1, s, func):
         blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
         x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
-        print(np.average(x)*0.5)
-        thresh = np.average(x)*0.5
+        thresh = 255*s*s*0.17
         x[x < thresh] = 0
         x[x > thresh] = 255
-        print("finished")
         return np.array(x, dtype=np.uint8)
     
     #TODO work on the threshold

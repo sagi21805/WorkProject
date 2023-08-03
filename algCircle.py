@@ -1,45 +1,67 @@
 import cv2
 from algGenral import Img 
 import numpy as np
+import multiprocessing.pool
+import random as r
 
  # dict of types {float : tuple} 
 class CircleImg(Img):
 
     def __init__(self, liveImg) -> None:
         super().__init__(liveImg)
-        self.circleDict = {}
-        self.aprrovedCircles = {}
+        self.circles = {}
+
+    def mainCirc(self, s, func):
+        with multiprocessing.pool.Pool(8) as p:
+            r = p.starmap(self.recognizeRectangle, [(s, func), ])
+        self.prepedImg = r[0][0]
+        self.markedImg = r[0][1]
+        self.circles = r[0][2]
+        self.CircContours = r[0][3]
+        cv2.imshow("p", self.prepedImg)
 
 
-    # worth trying with real camera and data
-    def recognizeCircle(self, s, func):
+    def recognizeRectangle(self, s, func):
         self.imgPrep(s, func)
-        rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        hierarchy = hierarchy[0]
-        if len(rectContours) != 0:
+        CircContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        if len(CircContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
-            for index, contour in enumerate(rectContours):
+            hierarchy = hierarchy[0]
+
+            for index, contour in enumerate(CircContours):
                 # if hierarchy[index][2] == -1:
-                        if cv2.contourArea(contour) > 80:
-                            rect = cv2.minAreaRect(contour)
-                            box = cv2.boxPoints(rect)
-                            box = np.int0(box)
-                            self.rectList.append(box)
+                        if cv2.contourArea(contour) > 200:
+                            (x, y), r = cv2.minEnclosingCircle(contour)
+                            self.circles.update({r : (round(x), round(y))})
+            return [self.prepedImg, self.markedImg, self.circles, CircContours]            
 
-                                                
-
-    def mark(self):
-        for rad in self.aprrovedCircles:
-            self.markedImg = cv2.circle(self.img, (self.aprrovedCircles[rad][0],self.aprrovedCircles[rad][1]), round(rad), (255, 0, 0), 2)
     
-    def markUnstaybled(self):   
-        for rad in self.circleDict:
-            self.markedImg = cv2.circle(self.img, (self.circleDict[rad][0],self.circleDict[rad][1]), round(rad), (255, 0, 255), 2)
+    def mark(self):   
+        for rad in self.circles:
+            self.markedImg = cv2.circle(self.img, (self.circles[rad][0],self.circles[rad][1]), round(rad), (255, 0, 255), 2)
 
-   
-    
+    def findClosestPoint(self, x, y):
+            closetPointDist = np.inf
+            r = 0
+            for rad in self.circles: 
+                point = self.circles[rad]
+                dist = np.sqrt((point[0] - x)**2 + (point[1] - y)**2)
+                if dist < closetPointDist:
+                    closetPointDist = dist
+                    r = rad
+            return r
+        
+    def markByClicking(self, event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONUP:
+            rad = self.findClosestPoint(x, y)
+            cv2.circle(self.markedImg, self.circles[rad], round(rad),(0,255,255),2)
+            cv2.putText(self.markedImg, str(np.round(2*rad/ self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)),(x, y+r.randint(-30, 30)) ,cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+            del self.circles[rad]
 
-
+    def markAll(self):
+        for rad in self.circles:
+            cv2.circle(self.markedImg,self.circles[rad], round(rad) ,(0,255,255),2)
+            cv2.imshow("nar", self.markedImg)
             # img = cv2.putText(img, str(round(int(r)* 2 * PIXELS_TO_MICROMETER, 2)), (round(x), round(y)) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
             # img = cv2.putText(img, str((circle.x, circle.y, circle.r)), (round(x + 10), round(y + 10)) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
             
