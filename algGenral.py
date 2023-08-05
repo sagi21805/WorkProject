@@ -26,6 +26,7 @@ class Img(ABC):
     
     @staticmethod
     def applyWindow(arr1, s, func):
+        # TODO:
         blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
         x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
         thresh = np.average(x)*0.7
