@@ -17,38 +17,42 @@ class RectImg(Img):
         self.markedImg = r[0][1]
         self.rectList = r[0][2]
         self.rectContours = r[0][3]
+        cv2.imshow("p", self.prepedImg)
 
 
     def recognizeRectangle(self, s, func):
         self.imgPrep(s, func)
-        self.rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        hierarchy = hierarchy[0]
-        if len(self.rectContours) != 0:
+        rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        if len(rectContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
-            for index, contour in enumerate(self.rectContours):
-                if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
-                    if hierarchy[hierarchy[index][2]][2] == -1:
-                        if cv2.contourArea(contour) > 80:
-                            rect = cv2.minAreaRect(contour)
-                            box = cv2.boxPoints(rect)
-                            box = np.int0(box)
-                            self.rectList.append(box)
-                            self.shapesConstants.update({"rectList" : self.rectList})
-                            self.shapesContours.append(self.rectContours)
-        return [self.prepedImg, self.markedImg, self.rectList, self.rectContours]
+            hierarchy = hierarchy[0]
+
+            for index, contour in enumerate(rectContours):
+                # if hierarchy[index][2] == -1:
+                #         if cv2.contourArea(contour) > 200:
+                    rect = cv2.minAreaRect(contour)
+                    box = cv2.boxPoints(rect)
+                    box = np.int0(box)
+                    self.rectList.append(box)
+    
+                
+
+
+        return [self.prepedImg, self.markedImg, self.rectList, rectContours]
 
     
     def mark(self):
-        for i, rect in enumerate(self.rectList):
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) * self.pixelToMicro , 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
+        for rect in self.rectList:
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
             # if np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1])  , 2) < 150 and np.round(np.sqrt((rect[1][0] - rect[2][0])**2 + (rect[1][1] - rect[2][1])**2) * self.pixelToMicro , 2) > 300:
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
             cv2.imshow("markedImage", self.markedImg)
+    
                 
     def markAll(self):
         for rect in self.rectContours:
-            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
-            cv2.imshow("nar", self.markedImg)
+            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
+        cv2.imshow("nar", self.markedImg)
             
     # TODO improve with numpy!
     
@@ -66,8 +70,6 @@ class RectImg(Img):
         if event == cv2.EVENT_LBUTTONUP:
             rect = self.findClosestPoint(x, y)
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) * self.pixelToMicro , 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
-            print(rect)
-        
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 10), 2, cv2.LINE_AA)
         
                 
