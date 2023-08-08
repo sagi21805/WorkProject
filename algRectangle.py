@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from algGenral import Img
 import multiprocessing.pool
+import time
 
 class RectImg(Img):
     
@@ -10,9 +11,11 @@ class RectImg(Img):
         self.aprrovedRect = []
         self.rectList = []
 
-    def mainRect(self, s, func):
-        with multiprocessing.pool.Pool(8) as p:
+    def main(self, s, func):
+        st = time.time()
+        with multiprocessing.pool.Pool() as p:
             r = p.starmap(self.recognizeRectangle, [(s, func), ])
+        print(f"time: {time.time() - st}")
         self.prepedImg = r[0][0]
         self.markedImg = r[0][1]
         self.rectList = r[0][2]
@@ -27,9 +30,9 @@ class RectImg(Img):
             #[next, previous, first child, parent] --> hierarchy 
             hierarchy = hierarchy[0]
 
-            for index, contour in enumerate(rectContours):
+            for contour in rectContours:
                 # if hierarchy[index][2] == -1:
-                #         if cv2.contourArea(contour) > 200:
+                if cv2.contourArea(contour) > 200:
                     rect = cv2.minAreaRect(contour)
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)

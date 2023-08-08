@@ -7,9 +7,8 @@ class Img(ABC):
     def __init__(self, liveImg: np.ndarray) -> None:
         self.img = liveImg
         self.gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        self.lenSize = 10
+        self.lenSize = 5
         self.pixelToMicro = 0.174 * self.lenSize
-        print(self.pixelToMicro)
   
     def imgPrep(self, s, func):
         #TODO try avarage and than canny on window
@@ -28,7 +27,7 @@ class Img(ABC):
         # TODO:
         blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
         x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
-        thresh = 255*s*s*0.17
+        thresh = 255*s*s*0.48
         x[x < thresh] = 0
         x[x > thresh] = 255
         return np.array(x, dtype=np.uint8)

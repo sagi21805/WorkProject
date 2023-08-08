@@ -11,7 +11,7 @@ class CircleImg(Img):
         super().__init__(liveImg)
         self.circles = {}
 
-    def mainCirc(self, s, func):
+    def main(self, s, func):
         with multiprocessing.pool.Pool(8) as p:
             r = p.starmap(self.recognizeRectangle, [(s, func), ])
         self.prepedImg = r[0][0]
@@ -23,16 +23,18 @@ class CircleImg(Img):
 
     def recognizeRectangle(self, s, func):
         self.imgPrep(s, func)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
+        self.prepedImg = cv2.morphologyEx(self.prepedImg, cv2.MORPH_ELLIPSE, kernel, iterations=1)
+
         CircContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         if len(CircContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
             hierarchy = hierarchy[0]
 
             for index, contour in enumerate(CircContours):
-                # if hierarchy[index][2] == -1:
-                        if cv2.contourArea(contour) > 200:
-                            (x, y), r = cv2.minEnclosingCircle(contour)
-                            self.circles.update({r : (round(x), round(y))})
+                    if cv2.contourArea(contour) > 200:
+                        (x, y), r = cv2.minEnclosingCircle(contour)
+                        self.circles.update({r : (round(x), round(y))})
             return [self.prepedImg, self.markedImg, self.circles, CircContours]            
 
     
