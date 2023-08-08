@@ -66,7 +66,6 @@ class CircleImg(Img):
             # img = cv2.putText(img, str((circle.x, circle.y, circle.r)), (round(x + 10), round(y + 10)) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
             
 
-cv2.morphologyEx(arr, 2, cv2.MORPH_)
 
 
 
