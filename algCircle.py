@@ -69,7 +69,6 @@ class CircleImg(Img):
 
 
 
-
         
 
 
