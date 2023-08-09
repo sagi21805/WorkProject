@@ -40,7 +40,9 @@ class CircleImg(Img):
     
     def mark(self):   
         for rad in self.circles:
-            self.markedImg = cv2.circle(self.img, (self.circles[rad][0],self.circles[rad][1]), round(rad), (255, 0, 255), 2)
+            cv2.circle(self.markedImg, (self.circles[rad][0],self.circles[rad][1]), round(rad), (255, 0, 255), 2)
+            cv2.putText(self.markedImg, str(np.round(2*rad/ self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), ((self.circles[rad][0] - round(rad) ),self.circles[rad][1]) ,cv2.FONT_HERSHEY_SIMPLEX, 0.8, (50, 0, 255), 2, cv2.LINE_AA)
+
 
     def findClosestPoint(self, x, y):
             closetPointDist = np.inf
@@ -56,8 +58,8 @@ class CircleImg(Img):
     def markByClicking(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONUP:
             rad = self.findClosestPoint(x, y)
-            cv2.circle(self.markedImg, self.circles[rad], round(rad),(0,255,255),2)
-            cv2.putText(self.markedImg, str(np.round(2*rad/ self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)),(x, y+r.randint(-30, 30)) ,cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+            cv2.circle(self.markedImg, self.circles[rad], round(rad),(0, 255, 255),1)
+            cv2.putText(self.markedImg, str(np.round(2*rad/ self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)),(x, y) ,cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 5, 255), 2, cv2.LINE_AA)
             del self.circles[rad]
 
     def markAll(self):
