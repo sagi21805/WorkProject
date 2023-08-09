@@ -3,6 +3,7 @@ from algGenral import Img
 import numpy as np
 import multiprocessing.pool
 import random as r
+from numba import jit
 
  # dict of types {float : tuple} 
 class CircleImg(Img):
@@ -19,7 +20,6 @@ class CircleImg(Img):
         self.circles = r[0][2]
         self.CircContours = r[0][3]
         cv2.imshow("p", self.prepedImg)
-
 
     def recognizeRectangle(self, s, func):
         self.imgPrep(s, func)

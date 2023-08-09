@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from abc import ABC
 import numpy.lib.stride_tricks
+from numba import jit
+
 class Img(ABC):
 
     def __init__(self, liveImg: np.ndarray) -> None:
@@ -19,18 +21,18 @@ class Img(ABC):
         
         # sharpend = cv2.filter2D(resized, -1, filter)
         blured = cv2.bilateralFilter(resized, 15, 75, 75)
-        self.prepedImg = Img.applyWindow(blured, s, func)
+        self.prepedImg = applyWindow(blured, s, func)
         self.markedImg = cv2.resize(self.img, (self.prepedImg.shape[1],self.prepedImg.shape[0]))
-    
-    @staticmethod
-    def applyWindow(arr1, s, func):
-        # TODO:
-        blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
-        x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
-        thresh = 255*s*s*0.48
-        x[x < thresh] = 0
-        x[x > thresh] = 255
-        return np.array(x, dtype=np.uint8)
+        
+@jit(nopython=True)
+def applyWindow(arr1, s, func):
+    # TODO:
+    blocked = numpy.lib.stride_tricks.sliding_window_view(arr1, (s, s))
+    x = func(blocked, axis = tuple(range(arr1.ndim, blocked.ndim)))
+    thresh = 255*s*s*0.48
+    x[x < thresh] = 0
+    x[x > thresh] = 255
+    return np.array(x, dtype=np.uint8)
     
     #TODO work on the threshold
     #TODO make it work on circles
