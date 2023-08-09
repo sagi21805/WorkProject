@@ -1,5 +1,5 @@
 import time
-from numba import jit
+from numba import njit
 import numpy as np
 import numpy.lib.stride_tricks
 import cv2
@@ -7,8 +7,7 @@ import multiprocessing.pool
 from cProfile import Profile
 from pstats import SortKey, Stats
 
-
-@jit(nopython=True)
+@njit(fastmath=True)
 def func(img: np.ndarray, s):
     thresh = 255*s*s*0.3
     blocked = numpy.lib.stride_tricks.sliding_window_view(img, (s, s))
@@ -27,14 +26,10 @@ def last():
         img = cv2.resize(img, (1280, 720))
         st = time.time()
         new = func(img, 3)
+        print(time.time() - st)
         cv2.imshow("!", new)
         cv2.waitKey(1)
-
-with Profile() as profile:
-    print(f"{last() = }")
-    (
-        Stats(profile).strip_dirs().sort_stats(SortKey.CALLS).print_stats()
-    )
+last()
     
 
 
