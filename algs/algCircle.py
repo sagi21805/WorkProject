@@ -1,5 +1,5 @@
 import cv2
-from algGenral import Img 
+from algs.algGenral import Img
 import numpy as np
 import multiprocessing.pool
 import random as r
