@@ -11,26 +11,21 @@ class RectImg(Img):
         self.aprrovedRect = []
         self.rectList = []
 
-    def main(self, s, func):
+    def main(self, s):
         st = time.time()
-        with multiprocessing.pool.Pool() as p:
-            r = p.starmap(self.recognizeRectangle, [(s, func), ])
+        self.rec(s)
         print(f"time: {time.time() - st}")
-        self.prepedImg = r[0][0]
-        self.markedImg = r[0][1]
-        self.rectList = r[0][2]
-        self.rectContours = r[0][3]
         cv2.imshow("p", self.prepedImg)
 
 
-    def recognizeRectangle(self, s, func):
-        self.imgPrep(s, func)
-        rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        if len(rectContours) != 0:
+    def rec(self, s):
+        self.imgPrep(s)
+        self.rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        if len(self.rectContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
             hierarchy = hierarchy[0]
 
-            for contour in rectContours:
+            for contour in self.rectContours:
                 # if hierarchy[index][2] == -1:
                 if cv2.contourArea(contour) > 200:
                     rect = cv2.minAreaRect(contour)
@@ -41,7 +36,7 @@ class RectImg(Img):
                 
 
 
-        return [self.prepedImg, self.markedImg, self.rectList, rectContours]
+        return [self.prepedImg, self.markedImg, self.rectList, self.rectContours]
 
     
     def mark(self):
