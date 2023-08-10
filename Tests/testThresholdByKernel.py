@@ -1,6 +1,10 @@
 import numpy as np
 
-d = {1: 2, 2: 3}
+def test(stop):
+    i=0
+    while i < stop:
+        yield i 
+        i+=1
 
-for num in d:
-    print(d[num])
+for i in range(10):
+    print(test(10))
