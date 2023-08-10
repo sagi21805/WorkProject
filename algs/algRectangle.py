@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from algGenral import Img
+from algs.algGenral import Img
 import multiprocessing.pool
 import time
 
@@ -20,18 +20,19 @@ class RectImg(Img):
 
     def rec(self, s):
         self.imgPrep(s)
+     
         self.rectContours, hierarchy = cv2.findContours(self.prepedImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         if len(self.rectContours) != 0:
             #[next, previous, first child, parent] --> hierarchy 
             hierarchy = hierarchy[0]
 
-            for contour in self.rectContours:
-                # if hierarchy[index][2] == -1:
-                if cv2.contourArea(contour) > 200:
-                    rect = cv2.minAreaRect(contour)
-                    box = cv2.boxPoints(rect)
-                    box = np.int0(box)
-                    self.rectList.append(box)
+            for index, contour in enumerate(self.rectContours):
+                if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
+                    if cv2.contourArea(contour) > 200:
+                        rect = cv2.minAreaRect(contour)
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+                        self.rectList.append(box)
     
                 
 
@@ -41,10 +42,9 @@ class RectImg(Img):
     
     def mark(self):
         for rect in self.rectList:
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 0), 3)
             # if np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1])  , 2) < 150 and np.round(np.sqrt((rect[1][0] - rect[2][0])**2 + (rect[1][1] - rect[2][1])**2) * self.pixelToMicro , 2) > 300:
-            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
-            cv2.imshow("markedImage", self.markedImg)
+            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
     
                 
     def markAll(self):
@@ -68,6 +68,6 @@ class RectImg(Img):
         if event == cv2.EVENT_LBUTTONUP:
             rect = self.findClosestPoint(x, y)
             cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 10), 2, cv2.LINE_AA)
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 10), 3, cv2.LINE_AA)
         
                 

@@ -1,5 +1,6 @@
 import cv2 
 from algs.algCircle import CircleImg
+from algs.algRectangle import RectImg
 import multiprocessing
 import numpy as np
 
@@ -17,7 +18,7 @@ if __name__ == "__main__":
         print("started")
         # circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
         circleImg = CircleImg(liveImg)
-        circleImg.main(1)
+        circleImg.main(2)
         circleImg.mark()
         # cv2.namedWindow("marked")  
         # cv2.setMouseCallback("marked",circleImg.markByClicking)  
