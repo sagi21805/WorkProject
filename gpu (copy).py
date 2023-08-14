@@ -22,7 +22,7 @@ def func(img: np.ndarray, block_size: tuple[int, int], thresh):
 def last():    
     v = cv2.VideoCapture(0)
     s = 2
-    thresh = 255*s*s*0.9
+    thresh = 255*s*s*0.5
     while True:
         suc, img = v.read()  
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
