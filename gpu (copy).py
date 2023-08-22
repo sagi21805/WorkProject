@@ -8,9 +8,7 @@ from cProfile import Profile
 from pstats import SortKey, Stats
 import multiprocessing.pool
 
-
-#for very large math like with s > 15 use with parallel=True
-
+# important!! - for *very* large operations (like s > 15 or even 20) parallel = True improves the calcs by a lot
 @njit(fastmath=True)
 def func(img: np.ndarray, block_size: tuple[int, int], thresh):
     blocked = numpy.lib.stride_tricks.sliding_window_view(img, block_size)
@@ -24,7 +22,7 @@ def func(img: np.ndarray, block_size: tuple[int, int], thresh):
 def last():    
     v = cv2.VideoCapture(0)
     s = 2
-    thresh = 255*s*s*0.9
+    thresh = 255*s*s*0.5
     while True:
         suc, img = v.read()  
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -35,11 +33,10 @@ def last():
         cv2.imshow("!", new)
         cv2.waitKey(1)
 
-with Profile() as profile:
-    print(f"{last() = }")
-    (
-        Stats(profile).strip_dirs().sort_stats(SortKey.CALLS).print_stats()
-    )
+last()
+        
+
+
     
 
 
