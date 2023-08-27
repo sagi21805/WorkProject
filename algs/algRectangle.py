@@ -36,7 +36,6 @@ class RectImg(Img):
                 
 
     
-                
 
 
         return [self.prepedImg, self.markedImg, self.rectList, self.rectContours]
@@ -44,9 +43,10 @@ class RectImg(Img):
     
     def mark(self):
         for rect in self.rectList:
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 0), 3)
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
             # if np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1])  , 2) < 150 and np.round(np.sqrt((rect[1][0] - rect[2][0])**2 + (rect[1][1] - rect[2][1])**2) * self.pixelToMicro , 2) > 300:
-            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
+            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
+            cv2.imshow("markedImage", self.markedImg)
     
                 
     def markAll(self):
