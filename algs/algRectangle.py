@@ -6,8 +6,8 @@ import time
 
 class RectImg(Img):
     
-    def __init__(self, liveImg) -> None:
-        super().__init__(liveImg)
+    def __init__(self, liveImg, lenSize) -> None:
+        super().__init__(liveImg, lenSize)
         self.aprrovedRect = []
         self.rectList = []
 
@@ -27,12 +27,14 @@ class RectImg(Img):
             hierarchy = hierarchy[0]
 
             for index, contour in enumerate(self.rectContours):
-                if hierarchy[index][2] != -1 and hierarchy[index][3] != -1:
+                if hierarchy[index][2] == -1:
                     if cv2.contourArea(contour) > 200:
                         rect = cv2.minAreaRect(contour)
                         box = cv2.boxPoints(rect)
                         box = np.int0(box)
                         self.rectList.append(box)
+                
+
     
                 
 

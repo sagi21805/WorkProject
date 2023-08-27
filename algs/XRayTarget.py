@@ -5,8 +5,8 @@ from algRectangle import RectImg
 
 class XRayTarget(RectImg):
 
-    def __init__(self, liveImg) -> None:
-        super().__init__(liveImg)
+    def __init__(self, liveImg, lenSize) -> None:
+        super().__init__(liveImg, lenSize)
 
         
 

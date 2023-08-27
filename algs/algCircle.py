@@ -8,8 +8,8 @@ from numba import jit
  # dict of types {float : tuple} 
 class CircleImg(Img):
 
-    def __init__(self, liveImg) -> None:
-        super().__init__(liveImg)
+    def __init__(self, liveImg, lenSize) -> None:
+        super().__init__(liveImg, lenSize)
         self.circles = {}
 
     def main(self, s):
@@ -29,16 +29,19 @@ class CircleImg(Img):
             hierarchy = hierarchy[0]
 
             for index, contour in enumerate(self.CircContours):
-                if hierarchy[index][2] == -1 and hierarchy[index][3] != -1:
+                # if hierarchy[index][2] == -1 and hierarchy[index][3] != -1:
                     (x, y), r = cv2.minEnclosingCircle(contour)
                     self.circles.update({r : (round(x), round(y))})
             return [self.prepedImg, self.markedImg, self.circles, self.CircContours]            
 
     
     def mark(self):   
-        for rad in self.circles:
-            cv2.circle(self.markedImg, (self.circles[rad][0],self.circles[rad][1]), round(rad), (255, 0, 255), 2)
-            cv2.putText(self.markedImg, str(np.round(2*rad/ self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)),(self.circles[rad]) ,cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 5, 255), 2, cv2.LINE_AA)
+        for i, rad in enumerate(self.circles):
+            color = (255, 0, 0)
+            if i % 2 == 0:
+                 color = (255, 0, 255)
+            self.markedImg = cv2.circle(self.markedImg, (self.circles[rad][0],self.circles[rad][1]), round(rad), color, 2)
+            self.markedImg = cv2.putText(self.markedImg, str(np.round(2*rad/ self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)),(self.circles[rad]) ,cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2, cv2.LINE_AA)
 
     def findClosestPoint(self, x, y):
             closetPointDist = np.inf

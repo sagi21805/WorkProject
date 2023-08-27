@@ -17,8 +17,8 @@ if __name__ == "__main__":
 
         print("started")
         # circleImg = RectImg(cv2.resize(liveImg, (1536, 864)))
-        circleImg = CircleImg(liveImg)
-        circleImg.main(2)
+        circleImg = RectImg(liveImg, 10)
+        circleImg.main(4)
         circleImg.mark()
         # cv2.namedWindow("marked")  
         # cv2.setMouseCallback("marked",circleImg.markByClicking)  
