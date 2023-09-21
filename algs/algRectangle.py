@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from algGenral import Img
+from algs.algGenral import Img
 import multiprocessing.pool
 import time
 
@@ -38,7 +38,6 @@ class RectImg(Img):
                     box = np.int0(box)
                     self.rectList.append(box)
     
-                
 
 
         return [self.prepedImg, self.markedImg, self.rectList, rectContours]
@@ -46,9 +45,9 @@ class RectImg(Img):
     
     def mark(self):
         for rect in self.rectList:
-            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            cv2.putText(self.markedImg, str(np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1]), 2)), rect[0], cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             # if np.round(np.sqrt((rect[1][0] - rect[0][0])**2 + (rect[1][1] - rect[0][1])**2) / self.pixelToMicro * (self.img.shape[1] / self.markedImg.shape[1])  , 2) < 150 and np.round(np.sqrt((rect[1][0] - rect[2][0])**2 + (rect[1][1] - rect[2][1])**2) * self.pixelToMicro , 2) > 300:
-            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),1)
+            cv2.drawContours(self.markedImg,[rect],0,(0,255,255),2)
             cv2.imshow("markedImage", self.markedImg)
     
                 

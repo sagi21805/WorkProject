@@ -1,5 +1,6 @@
 import time
-from numba import njit, prange
+from numba import njit
+from numba import prange
 import numpy as np
 import numpy.lib.stride_tricks
 import cv2
@@ -8,9 +9,9 @@ from pstats import SortKey, Stats
 import multiprocessing.pool
 
 # important!! - for *very* large operations (like s > 15 or even 20) parallel = True improves the calcs by a lot
-@njit(fastmath = True)
-def func(img: np.ndarray, blockSize: tuple[int, int], thresh):
-    blocked = numpy.lib.stride_tricks.sliding_window_view(img, blockSize)
+@njit(fastmath=True)
+def func(img: np.ndarray, block_size: tuple[int, int], thresh):
+    blocked = numpy.lib.stride_tricks.sliding_window_view(img, block_size)
     new = np.zeros((blocked.shape[0], blocked.shape[1]), np.uint8)
     for i in prange(len(blocked)):
         for j in prange(len(blocked[0])):
@@ -21,7 +22,7 @@ def func(img: np.ndarray, blockSize: tuple[int, int], thresh):
 def last():    
     v = cv2.VideoCapture(0)
     s = 2
-    thresh = 255*s*s*0.9
+    thresh = 255*s*s*0.5
     while True:
         suc, img = v.read()  
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
